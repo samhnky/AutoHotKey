@@ -4,9 +4,6 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory
 #SingleInstance Force
 
-randompassword := generate.password(13,14)
-
-
 Start:
 Gui, +AlwaysOnTop -SysMenu +Owner  ; +Owner avoids a taskbar button.
 Gui, Add, Button, gNewEmployee default, &New Employee
@@ -29,7 +26,7 @@ Gui, Add, Text,, Employee Supervisor:
 Gui, Add, Edit, vNewEmployeeName ym  ; The ym option starts a new column of controls.
 Gui, Add, Edit, vNewEmployeeUsername
 Gui, Add, Edit, vNewEmployeeID
-Gui, Add, Edit, vNewEmployeePass, %randompassword%
+Gui, Add, Edit, vNewEmployeePass
 
 Gui, Add, Button, gbcopy yp xp+85, &Copy
 
@@ -40,11 +37,6 @@ Gui, Add, Button, gCancel xp+30, Cance&l
 Gui, Add, Button, gOpenAD xp-190, Open &AD
 Gui, Show,  x250, New Employee
 return  ; End of auto-execute section. The script is idle until the user does something.
-
-bcopy:
-
-clipboard := % randompassword
-return
 
 ButtonOK:
 Gui, Submit  ; Save the input from the user to each control's associated variable.
@@ -105,52 +97,4 @@ else
 	Run, cmd /c dsa.msc, %A_WinDir%\system32\,Hide
 	WinWaitActive, Active Directory Users and Computers
 	return
-}
-
-Class generate
-{
-    password(min:=13, max:=24) {
-        Static r_min := 32                                              ; Start of ASCII (after control chars)
-             , r_max := 126                                             ; End of ASCII (delete char omitted)
-        
-        p_len := this.rand(min, max)                                    ; Generate random pass length
-        , arr := []                                                     ; Array to store pass chars
-        , str := ""                                                     ; String to build final pass
-        
-        this.get_symbols(p_len * this.rand(0.1, 0.2), arr)              ; Fill array with 10-20%: Symbols
-        Loop, Parse, % "dul"                                            ; And digits/upper/lower
-            this.get_dul(A_LoopField, p_len * this.rand(0.1, 0.2), arr)
-        
-        While (arr.MaxIndex() < p_len)                                  ; While pass length not met
-            arr.Push(Chr(this.rand(r_min, r_max)))                      ; Keep adding random chars
-        
-        While (arr.Count() > 0)                                         ; While chars remain in array
-            i := this.rand(arr.MinIndex(), arr.MaxIndex())              ; Pick random char to remove
-            , str .= arr.RemoveAt(i)                                    ; And add it to string
-        
-        Return str                                                      ; Return generated password
-    }
-    
-    get_symbols(num, arr) {
-        Static _sym := [[33,47], [58,64], [91,96], [123,126]]           ; Symbol ranges grouped
-        min := _sym.MinIndex(), max := _sym.MaxIndex()                  ; Min/max group index
-        Loop, % num
-            i := this.rand(min, max)                                    ; Pick random group index
-            , si := this.rand(_sym[i].1, _sym[i].2)                     ; Pick random num from group range
-            , arr.Push(Chr(_sym[i][si]))                                ; Add symbol to array
-    }
-    
-    get_dul(type, num, arr) {
-        Static arr_d := [48, 57]                                        ; Digit range
-             , arr_u := [65, 90]                                        ; Upper alpha range
-             , arr_l := [97, 122]                                       ; Lower alpha range
-        
-        Loop, % num
-            arr.Push(Chr(this.rand(arr_%type%.1, arr_%type%.2)))        ; Add random char using d/u/l ranges
-    }
-    
-    rand(min, max) {                                                    ; Random as a callable method
-        Random, r, % min, % max
-        Return r
-    }
 }
