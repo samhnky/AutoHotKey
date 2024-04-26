@@ -28,7 +28,7 @@ Gui, Add, Text,, Employee Supervisor:
 Gui, Add, Edit, vNewEmployeeName ym  ; The ym option starts a new column of controls.
 Gui, Add, Edit, vNewEmployeeUsername
 Gui, Add, Edit, vNewEmployeeID
-Gui, Add, Edit, vNewEmployeePass, randompassword
+Gui, Add, Edit, vNewEmployeePass, %randompassword%
 
 Gui, Add, Button, gbcopy yp xp+85, &Copy
 
