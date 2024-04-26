@@ -4,6 +4,8 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory
 #SingleInstance Force
 
+randompassword := RandomPasswordGenerator()
+
 Start:
 Gui, +AlwaysOnTop -SysMenu +Owner  ; +Owner avoids a taskbar button.
 Gui, Add, Button, gNewEmployee default, &New Employee
@@ -26,7 +28,7 @@ Gui, Add, Text,, Employee Supervisor:
 Gui, Add, Edit, vNewEmployeeName ym  ; The ym option starts a new column of controls.
 Gui, Add, Edit, vNewEmployeeUsername
 Gui, Add, Edit, vNewEmployeeID
-Gui, Add, Edit, vNewEmployeePass
+Gui, Add, Edit, vNewEmployeePass, randompassword
 
 Gui, Add, Button, gbcopy yp xp+85, &Copy
 
@@ -97,4 +99,41 @@ else
 	Run, cmd /c dsa.msc, %A_WinDir%\system32\,Hide
 	WinWaitActive, Active Directory Users and Computers
 	return
+}
+
+; Random Password Generator
+RandomPasswordGenerator() {
+    ; Define character sets
+    upperCaseChars := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    lowerCaseChars := "abcdefghijklmnopqrstuvwxyz"
+    numberChars := "0123456789"
+    specialChars := "!.*"
+
+    ; Initialize the password
+    password := ""
+
+    ; Add one uppercase character
+    password .= SubStr(upperCaseChars, Mod(Random(), StrLen(upperCaseChars)) + 1)
+
+    ; Add one lowercase character
+    password .= SubStr(lowerCaseChars, Mod(Random(), StrLen(lowerCaseChars)) + 1)
+
+    ; Add one number
+    password .= SubStr(numberChars, Mod(Random(), StrLen(numberChars)) + 1)
+
+    ; Add one special character
+    password .= SubStr(specialChars, Mod(Random(), StrLen(specialChars)) + 1)
+
+    ; Add remaining characters
+    Loop, 8
+    {
+        randomCharSet := upperCaseChars . lowerCaseChars . numberChars . specialChars
+        password .= SubStr(randomCharSet, Mod(Random(), StrLen(randomCharSet)) + 1)
+    }
+
+    ; Shuffle the password
+    password := StrReplace(password, "", "")
+
+    ; Return the generated password
+    return password
 }
